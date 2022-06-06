@@ -1,0 +1,95 @@
+@startuml
+allowmixing
+!includeurl https://raw.githubusercontent.com/scott-wong/C4-PlantUML/master/C4_Context.puml
+Title Grants as a Service Domain Model
+
+
+hide empty members
+hide circle
+skinparam actorStyle stickman
+
+
+
+
+Boundary(a,"Organisations") {
+    Entity Organisation
+ } 
+
+Boundary(IUsers, "Internal Users") {
+ 
+    actor :InternalUser:
+  
+    Actor CaseWorker 
+
+    InternalUser <|-right- CaseWorker
+} 
+
+Boundary(Users, "Organisational Users") {
+
+
+    actor :Applicant: as bsp 
+    bsp -- Organisation
+
+ 
+ }
+ 
+Boundary(CaseManagement, "Grants Case Management") {
+    Entity CaseWorkerAccount
+
+    Entity GrantApplication {
+     }
+     
+    Entity Interaction {
+     }
+
+    
+    Entity ParticipantAgreement {}
+
+    Interaction --* GrantApplication
+
+    CaseWorker -- CaseWorkerAccount
+    CaseWorkerAccount -- GrantApplication
+    ParticipantAgreement . GrantApplication
+}
+Boundary(Grants, "Grants & contracts") {
+    Entity Contract {}
+    Entity GrantSpecification { }
+    Entity Category {}
+    Entity InvitationToApplyCompetition {}
+    Entity GrantApplication {}
+    Entity Grant {}
+   
+    GrantSpecification -- InvitationToApplyCompetition
+    InvitationToApplyCompetition - GrantApplication
+    Grant - GrantSpecification
+    Category ..> GrantApplication
+    GrantApplication ..> Grant
+
+    Grant -- Category
+    Grant -- Contract
+
+    CaseWorker - Grant
+
+}
+
+Boundary(Digital, "Digital authenticated"){
+
+
+        
+        
+    bsp - DigitalAccount 
+
+    Entity grantUserJourney {
+    }
+        Entity grantSpecification {
+
+        }
+
+        grantSpecification -left grantUserJourney
+        grantUserJourney -u-* DigitalAccount
+        DigitalAccount ..> GrantApplication : "submit grant application"
+
+    'Formatting only
+    GrantApplication -down[hidden]- DigitalAccount
+}
+@enduml

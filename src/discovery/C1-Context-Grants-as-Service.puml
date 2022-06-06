@@ -1,0 +1,52 @@
+@startuml "grantAsService"
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+LAYOUT_TOP_DOWN()
+
+LAYOUT_WITH_LEGEND()
+
+
+Person_Ext(organisational_user, "user", "Oraganisations that apply for Grants", $sprite="users")
+Person(grants_admin_user, "Grants Admin")
+Person(content_designer, "Content Designer", "Design and publish grant specific digital forms")
+
+System_Boundary(c1_external_services, "External Services"){
+
+System_Boundary(c1_external_data_services, "External Data Services"){
+Container_Ext(ONS_api, "ONS API", "Office for National Statistics API for Local authorities data")
+Container_Ext(companiesHouse_api, "CH API", "Companies House API for organisations data")
+}
+System_Boundary(identity_access_management_services, "IDAM Services"){
+System_Ext(GovSignin, "GOV UK Sign in", "GOV.UK Sign In is the new way for government services to sign in their users")
+System_Ext(GovGW, "Government Gateway Identity & Access Management", "Government Gateway Identity & Access Management")
+System_Ext(FederatedIDAM, "Federated IDAM", "Federated IDAM e.g. Azure AD, AWS Cognito")
+}
+Container_Ext(notification_system, "GOV.UK Notify API", "Central and local Government authorities can use GOV.UK Notify to keep users updated.Notify makes it easy to create, customise and send:")
+
+System_Ext(Grant_payments_Service, "Payments Service", "Pay users for approved grants")
+Container_Ext(Content_Management_Service, "Headless CMS", "content platform helps digital teams to innovate, iterate and go to market faster with an agile, modern tech stack")
+
+}
+System_Boundary(grants_as_service, "Grants as Service"){
+Container(apply_for_grants_web_app, "Search & Apply Service", "MVC Web App Allows users to view and apply for available grants")
+Container(manage_grants_service, "Manage Grants Service", "MVC Web App Allows grants administrators to process grant applications e.g. assess, Calculate, Award, Pay")
+Container(fileStorage, "File storage", "secure cloud storage", $tags="storage")
+Rel(organisational_user, apply_for_grants_web_app, "Apply")
+Rel(content_designer, Content_Management_Service, "publish digital forms")
+Rel(apply_for_grants_web_app, Content_Management_Service, "Uses")
+Rel(grants_admin_user, manage_grants_service, "administer grant process e.g. Assess Calculate Award")
+Rel(apply_for_grants_web_app, manage_grants_service, "submit grant applications")
+
+Rel(manage_grants_service, notification_system, "sends comms & notifications to users")
+Rel(manage_grants_service, Grant_payments_Service, "make payments for approved grants")
+Rel(apply_for_grants_web_app, c1_external_data_services, "uses data")
+Rel(grants_as_service, identity_access_management_services, "Users Registration, Authentication & Authorisation")
+
+}
+
+
+@enduml
